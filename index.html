@@ -80,6 +80,14 @@ h1{font-family:var(--f-display);font-weight:800;font-size:clamp(34px,7vw,56px);l
 .credit{font-size:12px;color:var(--ink-2)}
 .credit a{color:var(--ink-2)}
 .lb a{color:var(--ink)}
+.watch{display:grid;gap:8px;padding-top:14px;border-top:1px dashed var(--rule)}
+.watch-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.watch-row .label{min-width:3.5em}
+.prov{display:inline-flex;border-radius:8px;overflow:hidden;line-height:0;outline-offset:2px}
+.prov img{width:36px;height:36px;display:block}
+.prov:focus-visible{outline:2px solid var(--marquee)}
+.watch-none{margin:0;font-size:13px;color:var(--ink-2)}
+.watch-note{font-size:11px;color:var(--ink-2)}
 .history{display:grid;gap:8px}
 .hlist{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
 .hitem{flex:0 0 auto;width:56px;cursor:pointer;border:0;padding:0;background:none}
@@ -112,6 +120,7 @@ h1{font-family:var(--f-display);font-weight:800;font-size:clamp(34px,7vw,56px);l
       <button class="chip" id="f-high" data-f="high" aria-pressed="false">4 星以上</button>
       <button class="chip" id="f-review" data-f="review" aria-pressed="false">有寫評論</button>
       <button class="chip" id="f-liked" data-f="liked" aria-pressed="false">按過愛心</button>
+      <button class="chip" id="f-stream" data-f="stream" aria-pressed="false" hidden>台灣有串流</button>
     </div>
     <button class="pick" id="pick" disabled>隨機抽一部</button>
   </div>
@@ -137,6 +146,11 @@ h1{font-family:var(--f-display);font-weight:800;font-size:clamp(34px,7vw,56px);l
       <dl class="facts" id="facts"></dl>
       <p class="syn" id="syn"></p>
       <details class="syn-en" id="syn-en" hidden><summary>英文簡介</summary><p id="syn-en-t"></p></details>
+      <section class="watch" id="watch" hidden aria-label="在台灣哪裡看">
+        <span class="label">在台灣哪裡看</span>
+        <div id="watch-rows"></div>
+        <span class="watch-note" id="watch-note"></span>
+      </section>
       <div class="lb" id="lb"></div>
     </div>
   </article>
@@ -145,13 +159,39 @@ h1{font-family:var(--f-display);font-weight:800;font-size:clamp(34px,7vw,56px);l
     <span class="label">剛剛抽過</span>
     <div class="hlist" id="hlist"></div>
   </section>
-  <footer class="credit">電影資料與中文譯名來源：<a href="https://letterboxd.com/twohundredlee/" target="_blank" rel="noopener">Letterboxd</a>、<a href="https://www.themoviedb.org/" target="_blank" rel="noopener">TMDB</a>。本網站非 Letterboxd 或 TMDB 官方網站。</footer>
+  <footer class="credit">電影資料與中文譯名來源：<a href="https://letterboxd.com/twohundredlee/" target="_blank" rel="noopener">Letterboxd</a>、<a href="https://www.themoviedb.org/" target="_blank" rel="noopener">TMDB</a>。觀看管道資料來源：<a href="https://www.justwatch.com/tw" target="_blank" rel="noopener">JustWatch</a>（經由 TMDB）<span id="prov-date"></span>。本網站非 Letterboxd、TMDB 或 JustWatch 官方網站。</footer>
 </div>
 
 <script>
 (function(){
   const $=id=>document.getElementById(id);
-  let FILMS=[], filter='all', deck=[], hist=[];
+  let FILMS=[], filter='all', deck=[], hist=[], PROV=null, cur=null;
+  const KINDS=[['flatrate','訂閱'],['free','免費'],['ads','免費'],['rent','租借'],['buy','購買']];
+  function hasStream(f){ const r=PROV&&PROV.f[f.slug]; return !!(r&&(r.flatrate||r.free||r.ads)); }
+  function renderWatch(f){
+    const sec=$('watch'), rows=$('watch-rows'); rows.innerHTML='';
+    const r=PROV&&PROV.f[f.slug];
+    if(!r){ sec.hidden=true; return; }
+    sec.hidden=false;
+    const groups={};
+    KINDS.forEach(([k,lab])=>{ (r[k]||[]).forEach(id=>{ (groups[lab]=groups[lab]||[]); if(!groups[lab].includes(id)) groups[lab].push(id); }); });
+    const labs=Object.keys(groups);
+    if(!labs.length){ const p=document.createElement('p'); p.className='watch-none'; p.textContent='目前在台灣查不到正版串流或租售管道。'; rows.appendChild(p); }
+    labs.forEach(lab=>{
+      const row=document.createElement('div'); row.className='watch-row';
+      const l=document.createElement('span'); l.className='label'; l.textContent=lab; row.appendChild(l);
+      groups[lab].forEach(id=>{
+        const pv=PROV.p[id]||['平台',''];
+        const a=document.createElement(r.link?'a':'span'); a.className='prov'; a.title=pv[0];
+        if(r.link){ a.href=r.link; a.target='_blank'; a.rel='noopener'; a.setAttribute('aria-label',pv[0]+'（開啟觀看頁面）'); }
+        if(pv[1]){ const img=document.createElement('img'); img.src='https://image.tmdb.org/t/p/w92'+pv[1]; img.alt=pv[0]; img.loading='lazy'; img.onerror=()=>{ a.textContent=pv[0]; a.style.lineHeight='1.4'; a.style.fontSize='12px'; }; a.appendChild(img); }
+        else { a.textContent=pv[0]; a.style.lineHeight='1.4'; a.style.fontSize='12px'; }
+        row.appendChild(a);
+      });
+      rows.appendChild(row);
+    });
+    $('watch-note').textContent='查詢日期 '+(r.at||'').replace(/-/g,'.')+'，實際上架情形以各平台為準';
+  }
   const COLS=5, PER=25;
   try{ filter=localStorage.getItem('lb-filter')||'all' }catch(e){}
 
@@ -168,7 +208,7 @@ h1{font-family:var(--f-display);font-weight:800;font-size:clamp(34px,7vw,56px);l
     el.setAttribute('role','img'); el.setAttribute('aria-label',(f.tw||f.n)+' 海報');
   }
   function pool(){
-    return FILMS.filter(f=> filter==='all'||(filter==='rated'&&f.r!=null)||(filter==='high'&&f.r>=4)||(filter==='review'&&f.rev.length)||(filter==='liked'&&f.lk));
+    return FILMS.filter(f=> filter==='all'||(filter==='stream'&&hasStream(f))||(filter==='rated'&&f.r!=null)||(filter==='high'&&f.r>=4)||(filter==='review'&&f.rev.length)||(filter==='liked'&&f.lk));
   }
   function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]} return a; }
   function refreshCount(){
@@ -178,6 +218,7 @@ h1{font-family:var(--f-display);font-weight:800;font-size:clamp(34px,7vw,56px);l
     deck=shuffle(pool().map(f=>f.i));
   }
   function show(f){
+    cur=f;
     const stub=$('stub'); stub.classList.remove('flip'); void stub.offsetWidth; stub.classList.add('flip');
     setPoster($('poster'),f);
     $('no').textContent='No. '+String(f.i+1).padStart(4,'0');
@@ -198,6 +239,7 @@ h1{font-family:var(--f-display);font-weight:800;font-size:clamp(34px,7vw,56px);l
     facts.filter(x=>x[1]).forEach(([k,v])=>{const dt=document.createElement('dt');dt.textContent=k;const dd=document.createElement('dd');dd.textContent=v;dl.append(dt,dd)});
     $('syn').textContent=f.twsyn||f.syn||'';
     const en=$('syn-en'); en.hidden=!(f.twsyn&&f.syn); en.open=false; $('syn-en-t').textContent=f.syn||'';
+    renderWatch(f);
     $('lb').innerHTML=''; if(f.slug){const a=document.createElement('a'); a.href='https://letterboxd.com/film/'+f.slug+'/'; a.target='_blank'; a.rel='noopener'; a.textContent='在 Letterboxd 打開這部片 ↗'; $('lb').appendChild(a)}
   }
   function addHist(f){
@@ -219,9 +261,16 @@ h1{font-family:var(--f-display);font-weight:800;font-size:clamp(34px,7vw,56px);l
   $('pick').addEventListener('click',pick);
   document.addEventListener('keydown',e=>{ if(e.code==='Space'&&e.target===document.body){e.preventDefault(); pick()} });
 
+  fetch('providers.json').then(r=>r.ok?r.json():null).then(d=>{
+    if(!d||!d.f) return; PROV=d;
+    $('f-stream').hidden=false;
+    if(d.updated) $('prov-date').textContent='，更新於 '+d.updated.replace(/-/g,'.');
+    if(FILMS.length) refreshCount();
+    if(cur) renderWatch(cur);
+  }).catch(()=>{});
   fetch('films.json').then(r=>{ if(!r.ok) throw new Error(r.status); return r.json() }).then(d=>{
     FILMS=d.films; FILMS.forEach((f,i)=>f.i=i);
-    if(!document.querySelector(`.chip[data-f="${filter}"]`)) filter='all';
+    if(!document.querySelector(`.chip[data-f="${filter}"]`)||(filter==='stream'&&!PROV)) filter='all';
     document.querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed',c.dataset.f===filter));
     refreshCount(); pick();
   }).catch(()=>{ $('count').textContent='片單載入失敗，請重新整理頁面。'; });
