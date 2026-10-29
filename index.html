@@ -158,8 +158,10 @@ h1{font-family:var(--f-display);font-weight:800;font-size:clamp(34px,7vw,56px);l
   function starStr(r){ if(r==null) return ''; const f=Math.floor(r); return '★'.repeat(f)+(r%1?'½':''); }
   function fmtDate(d){ if(!d) return ''; const [y,m,dd]=d.split('-'); return `${y}.${m}.${dd}`; }
   function setPoster(el,f){
-    el.textContent='';
-    if(f.s==null){ el.style.backgroundImage='none'; el.textContent=f.n; return; }
+    el.textContent=''; el.style.backgroundSize=''; el.style.backgroundPosition='';
+    if(f.img){ el.style.backgroundImage=`url("${f.img}")`; el.style.backgroundSize='cover'; el.style.backgroundPosition='center';
+      el.setAttribute('role','img'); el.setAttribute('aria-label',(f.tw||f.n)+' 海報'); return; }
+    if(f.s==null){ el.style.backgroundImage='none'; el.textContent=f.tw||f.n; return; }
     const sheet=Math.floor(f.s/PER), p=f.s%PER, c=p%COLS, r=Math.floor(p/COLS);
     el.style.backgroundImage=`url(posters/p${String(sheet).padStart(2,'0')}.webp)`;
     el.style.backgroundPosition=`${c*25}% ${r*25}%`;
