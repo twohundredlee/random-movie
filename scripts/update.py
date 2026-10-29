@@ -129,6 +129,8 @@ def main():
         if f is None:
             info = film_info(text(it, 'tmdb:movieId'), name, year)
             f = {'slug': slug, **info, 'r': None, 'lk': False, 'rev': [], 'w': watched, 'dc': 0, 's': None}
+            if text(it, 'tmdb:movieId'):
+                f['tm'] = int(text(it, 'tmdb:movieId'))
             films.insert(0, f)
             by_slug[slug] = f
             added.append(f.get('tw') or name)
