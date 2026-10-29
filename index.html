@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="從 twohundredlee 在 Letterboxd 看過的電影裡隨機抽一部。">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>抽一部twohundredlee看過的電影</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+/* Layout: one ticket stub centred on a projection-room wall; poster on the left of the stub, details right, stacked on phones */
+:root{
+  --wall:#dfe3e6; --wall-2:#cfd5d9;
+  --stub:#fbfaf6; --ink:#1e2429; --ink-2:#56606a; --rule:#d8d4ca;
+  --marquee:#d9641e; --marquee-ink:#fff8f0; --star:#d9641e;
+  --shadow:0 1px 0 rgba(30,36,41,.06),0 18px 40px -18px rgba(30,36,41,.35);
+  --f-display:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --wall:#161b20; --wall-2:#1d242a; --stub:#232b32; --ink:#ece8df; --ink-2:#a3abb2; --rule:#36404a;
+  --marquee:#ef7a35; --marquee-ink:#1b1410; --star:#f08a4b; --shadow:0 18px 40px -18px rgba(0,0,0,.7); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --wall:#161b20; --wall-2:#1d242a; --stub:#232b32; --ink:#ece8df; --ink-2:#a3abb2; --rule:#36404a;
+  --marquee:#ef7a35; --marquee-ink:#1b1410; --star:#f08a4b; --shadow:0 18px 40px -18px rgba(0,0,0,.7); color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--wall);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6;
+  background-image:repeating-linear-gradient(90deg,transparent 0 46px,var(--wall-2) 46px 47px);min-height:100%}
+.wrap{max-width:960px;margin:0 auto;padding-block:28px 48px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:grid;gap:22px}
+header{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:12px 24px}
+h1{font-family:var(--f-display);font-weight:800;font-size:clamp(34px,7vw,56px);line-height:.95;margin:0;letter-spacing:.01em;text-wrap:balance}
+.count{font-family:var(--f-mono);font-size:12px;color:var(--ink-2);letter-spacing:.06em;text-transform:uppercase}
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:500 13px var(--f-body);color:var(--ink);background:transparent;border:1px solid var(--rule);border-radius:999px;padding:6px 12px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--stub);border-color:var(--ink)}
+.chip:focus-visible,.pick:focus-visible,a:focus-visible{outline:2px solid var(--marquee);outline-offset:2px}
+.pick{margin-left:auto;font-family:var(--f-display);font-weight:800;font-size:22px;letter-spacing:.06em;text-transform:uppercase;
+  background:var(--marquee);color:var(--marquee-ink);border:0;border-radius:6px;padding:12px 26px;cursor:pointer;
+  box-shadow:0 3px 0 color-mix(in srgb,var(--marquee) 60%,#000)}
+.pick:active{transform:translateY(2px);box-shadow:0 1px 0 color-mix(in srgb,var(--marquee) 60%,#000)}
+.pick:disabled{opacity:.5;cursor:default}
+@media (max-width:560px){.pick{width:100%;margin-left:0}}
+
+.stub{position:relative;background:var(--stub);border-radius:10px;box-shadow:var(--shadow);display:grid;grid-template-columns:minmax(0,230px) minmax(0,1fr)}
+.stub::before,.stub::after{content:"";position:absolute;left:246px;width:22px;height:22px;border-radius:50%;background:var(--wall)}
+.stub::before{top:-11px}.stub::after{bottom:-11px}
+.poster-col{padding:22px;border-right:2px dashed var(--rule);display:grid;align-content:start;gap:12px}
+.poster{width:100%;max-width:100%;aspect-ratio:2/3;border-radius:4px;background-color:var(--wall-2);background-repeat:no-repeat;background-size:500% 500%;
+  display:grid;place-items:center;text-align:center;font-family:var(--f-display);font-weight:800;font-size:22px;color:var(--ink-2);padding:12px;overflow:hidden}
+.ticketno{font-family:var(--f-mono);font-size:11px;color:var(--ink-2);letter-spacing:.08em;text-transform:uppercase;display:flex;justify-content:space-between;gap:8px}
+.info{padding:24px 28px;display:grid;gap:16px;align-content:start;min-width:0}
+.eyebrow{font-family:var(--f-mono);font-size:12px;color:var(--ink-2);letter-spacing:.06em;text-transform:uppercase;display:flex;flex-wrap:wrap;gap:4px 14px}
+.title{font-family:var(--f-display);font-weight:800;font-size:clamp(30px,5vw,46px);line-height:1.05;margin:0;text-wrap:balance}
+.title .yr{font-weight:600;color:var(--ink-2);font-size:.6em;margin-left:.3em}
+.orig{margin:6px 0 0;color:var(--ink-2);font-size:14px}
+.tagline{margin:0;font-style:italic;color:var(--ink-2)}
+.mine{display:grid;gap:8px;padding:14px 16px;border:1px solid var(--rule);border-radius:8px}
+.mine-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px}
+.label{font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2)}
+.stars{color:var(--star);font-size:22px;letter-spacing:2px;line-height:1}
+.stars.none{font-size:14px;letter-spacing:0;color:var(--ink-2)}
+.heart{color:var(--marquee);font-size:14px}
+.review{margin:0;white-space:pre-wrap;font-size:16px;line-height:1.75;max-width:62ch}
+.review+.review{border-top:1px solid var(--rule);padding-top:8px}
+.revdate{display:block;font-family:var(--f-mono);font-size:11px;color:var(--ink-2);margin-top:2px}
+.facts{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 16px;margin:0;font-size:14px}
+.facts dt{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);padding-top:3px}
+.facts dd{margin:0}
+.syn{margin:0;color:var(--ink);max-width:65ch;font-size:14px}
+.syn-en{margin-top:-8px;font-size:13px;color:var(--ink-2);max-width:65ch}
+.syn-en summary{cursor:pointer;font-family:var(--f-mono);font-size:11px;letter-spacing:.08em}
+.syn-en p{margin:6px 0 0}
+.lb{font:500 13px var(--f-body);color:var(--ink-2)}
+.credit{font-size:12px;color:var(--ink-2)}
+.credit a{color:var(--ink-2)}
+.lb a{color:var(--ink)}
+.history{display:grid;gap:8px}
+.hlist{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.hitem{flex:0 0 auto;width:56px;cursor:pointer;border:0;padding:0;background:none}
+.hitem .poster{font-size:9px;padding:4px;border-radius:3px}
+@media (max-width:680px){
+  .stub{grid-template-columns:minmax(0,1fr)}
+  .stub::before,.stub::after{display:none}
+  .poster-col{border-right:0;border-bottom:2px dashed var(--rule);grid-template-columns:120px minmax(0,1fr);align-items:end;padding:16px}
+  .info{padding:18px 16px 22px}
+}
+.flip{animation:flip .45s ease-out}
+@keyframes flip{from{opacity:.2;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.flip{animation:none}}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="count" id="count">載入片單中…</div>
+      <h1>抽一部twohundredlee看過的電影</h1>
+    </div>
+  </header>
+
+  <div class="controls">
+    <div class="chips" role="group" aria-label="篩選">
+      <button class="chip" id="f-all" data-f="all" aria-pressed="true">全部看過的</button>
+      <button class="chip" id="f-rated" data-f="rated" aria-pressed="false">有評分</button>
+      <button class="chip" id="f-high" data-f="high" aria-pressed="false">4 星以上</button>
+      <button class="chip" id="f-review" data-f="review" aria-pressed="false">有寫評論</button>
+      <button class="chip" id="f-liked" data-f="liked" aria-pressed="false">按過愛心</button>
+    </div>
+    <button class="pick" id="pick" disabled>隨機抽一部</button>
+  </div>
+
+  <article class="stub" id="stub" aria-live="polite">
+    <div class="poster-col">
+      <div class="poster" id="poster"></div>
+      <div>
+        <div class="ticketno"><span>Admit one</span><span id="no">No. —</span></div>
+      </div>
+    </div>
+    <div class="info">
+      <div class="eyebrow" id="eyebrow"></div>
+      <div>
+        <h2 class="title" id="title">按下「隨機抽一部」</h2>
+        <p class="orig" id="orig"></p>
+      </div>
+      <p class="tagline" id="tagline" hidden></p>
+      <section class="mine" id="mine" hidden>
+        <div class="mine-h"><span class="label">我的評分</span><span class="stars" id="stars"></span><span class="heart" id="heart" hidden>♥ 喜歡</span></div>
+        <div id="reviews"></div>
+      </section>
+      <dl class="facts" id="facts"></dl>
+      <p class="syn" id="syn"></p>
+      <details class="syn-en" id="syn-en" hidden><summary>英文簡介</summary><p id="syn-en-t"></p></details>
+      <div class="lb" id="lb"></div>
+    </div>
+  </article>
+
+  <section class="history" id="history" hidden>
+    <span class="label">剛剛抽過</span>
+    <div class="hlist" id="hlist"></div>
+  </section>
+  <footer class="credit">電影資料與中文譯名來源：<a href="https://letterboxd.com/twohundredlee/" target="_blank" rel="noopener">Letterboxd</a>、<a href="https://www.themoviedb.org/" target="_blank" rel="noopener">TMDB</a>。本網站非 Letterboxd 或 TMDB 官方網站。</footer>
+</div>
+
+<script>
+(function(){
+  const $=id=>document.getElementById(id);
+  let FILMS=[], filter='all', deck=[], hist=[];
+  const COLS=5, PER=25;
+  try{ filter=localStorage.getItem('lb-filter')||'all' }catch(e){}
+
+  function starStr(r){ if(r==null) return ''; const f=Math.floor(r); return '★'.repeat(f)+(r%1?'½':''); }
+  function fmtDate(d){ if(!d) return ''; const [y,m,dd]=d.split('-'); return `${y}.${m}.${dd}`; }
+  function setPoster(el,f){
+    el.textContent='';
+    if(f.s==null){ el.style.backgroundImage='none'; el.textContent=f.n; return; }
+    const sheet=Math.floor(f.s/PER), p=f.s%PER, c=p%COLS, r=Math.floor(p/COLS);
+    el.style.backgroundImage=`url(posters/p${String(sheet).padStart(2,'0')}.webp)`;
+    el.style.backgroundPosition=`${c*25}% ${r*25}%`;
+    el.setAttribute('role','img'); el.setAttribute('aria-label',(f.tw||f.n)+' 海報');
+  }
+  function pool(){
+    return FILMS.filter(f=> filter==='all'||(filter==='rated'&&f.r!=null)||(filter==='high'&&f.r>=4)||(filter==='review'&&f.rev.length)||(filter==='liked'&&f.lk));
+  }
+  function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]} return a; }
+  function refreshCount(){
+    const n=pool().length;
+    $('count').textContent=`看過 ${FILMS.length} 部 · 目前可抽 ${n} 部`;
+    $('pick').disabled=!n;
+    deck=shuffle(pool().map(f=>f.i));
+  }
+  function show(f){
+    const stub=$('stub'); stub.classList.remove('flip'); void stub.offsetWidth; stub.classList.add('flip');
+    setPoster($('poster'),f);
+    $('no').textContent='No. '+String(f.i+1).padStart(4,'0');
+    const eb=[]; if(f.w) eb.push('看過 '+fmtDate(f.w)); if(f.dc>1) eb.push(`日記記錄 ${f.dc} 次`); if(f.g.length) eb.push(f.g.slice(0,3).join(' / '));
+    $('eyebrow').innerHTML=''; eb.forEach(t=>{const s=document.createElement('span'); s.textContent=t; $('eyebrow').appendChild(s)});
+    $('title').innerHTML=''; $('title').append(f.tw||f.n); if(f.y){const y=document.createElement('span'); y.className='yr'; y.textContent=f.y; $('title').appendChild(y)}
+    const sub=[]; if(f.tw&&f.tw!==f.n) sub.push(f.n); if(f.o&&f.o!==f.n&&f.o!==f.tw) sub.push(f.o);
+    $('orig').textContent=sub.join(' · ');
+    const tl=f.twtl||f.tl; $('tagline').hidden=!tl; $('tagline').textContent=tl||'';
+    $('mine').hidden=false;
+    const st=$('stars'); if(f.r!=null){st.className='stars';st.textContent=starStr(f.r);st.setAttribute('aria-label',f.r+' 顆星')} else {st.className='stars none';st.textContent='沒有評分';st.removeAttribute('aria-label')}
+    $('heart').hidden=!f.lk;
+    const rv=$('reviews'); rv.innerHTML='';
+    if(!f.rev.length){const p=document.createElement('p'); p.className='review'; p.style.color='var(--ink-2)'; p.style.fontSize='14px'; p.textContent='這部沒有寫評論。'; rv.appendChild(p)}
+    f.rev.forEach(x=>{const p=document.createElement('p'); p.className='review'; p.textContent=x.t; const d=document.createElement('span'); d.className='revdate'; d.textContent=fmtDate(x.d)+(x.rw?' · 重看':''); p.appendChild(d); rv.appendChild(p)});
+    const facts=[['導演',f.dir.join('、')],['片長',f.rt?f.rt+' 分鐘':''],['國家',f.c.join('、')],['類型',f.g.join('、')],['主演',f.cast.join('、')],['平均評分',f.avg?f.avg.toFixed(2)+' / 5':'']];
+    const dl=$('facts'); dl.innerHTML='';
+    facts.filter(x=>x[1]).forEach(([k,v])=>{const dt=document.createElement('dt');dt.textContent=k;const dd=document.createElement('dd');dd.textContent=v;dl.append(dt,dd)});
+    $('syn').textContent=f.twsyn||f.syn||'';
+    const en=$('syn-en'); en.hidden=!(f.twsyn&&f.syn); en.open=false; $('syn-en-t').textContent=f.syn||'';
+    $('lb').innerHTML=''; if(f.slug){const a=document.createElement('a'); a.href='https://letterboxd.com/film/'+f.slug+'/'; a.target='_blank'; a.rel='noopener'; a.textContent='在 Letterboxd 打開這部片 ↗'; $('lb').appendChild(a)}
+  }
+  function addHist(f){
+    hist=hist.filter(x=>x!==f.i); hist.unshift(f.i); hist=hist.slice(0,12);
+    $('history').hidden=hist.length<2;
+    const hl=$('hlist'); hl.innerHTML='';
+    hist.slice(1).forEach(i=>{const b=document.createElement('button'); b.className='hitem'; b.title=FILMS[i].tw||FILMS[i].n; const p=document.createElement('div'); p.className='poster'; setPoster(p,FILMS[i]); b.appendChild(p); b.onclick=()=>{show(FILMS[i]); addHist(FILMS[i])}; hl.appendChild(b)});
+  }
+  function pick(){
+    if(!deck.length) deck=shuffle(pool().map(f=>f.i));
+    if(!deck.length) return;
+    const f=FILMS[deck.pop()]; show(f); addHist(f);
+  }
+  document.querySelectorAll('.chip').forEach(b=>b.addEventListener('click',()=>{
+    filter=b.dataset.f; try{localStorage.setItem('lb-filter',filter)}catch(e){}
+    document.querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed',c===b));
+    refreshCount();
+  }));
+  $('pick').addEventListener('click',pick);
+  document.addEventListener('keydown',e=>{ if(e.code==='Space'&&e.target===document.body){e.preventDefault(); pick()} });
+
+  fetch('films.json').then(r=>{ if(!r.ok) throw new Error(r.status); return r.json() }).then(d=>{
+    FILMS=d.films; FILMS.forEach((f,i)=>f.i=i);
+    if(!document.querySelector(`.chip[data-f="${filter}"]`)) filter='all';
+    document.querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed',c.dataset.f===filter));
+    refreshCount(); pick();
+  }).catch(()=>{ $('count').textContent='片單載入失敗，請重新整理頁面。'; });
+})();
+</script>
+
+</body>
+</html>
