@@ -88,6 +88,10 @@ h1{font-family:var(--f-display);font-weight:800;font-size:clamp(34px,7vw,56px);l
 .prov:focus-visible{outline:2px solid var(--marquee)}
 .watch-none{margin:0;font-size:13px;color:var(--ink-2)}
 .watch-note{font-size:11px;color:var(--ink-2)}
+.watch-search{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;font-size:13px}
+.watch-search a{color:var(--ink);border:1px solid var(--rule);border-radius:999px;padding:3px 10px;text-decoration:none}
+.watch-search a:hover{border-color:var(--ink-2)}
+.watch-search a:focus-visible{outline:2px solid var(--marquee);outline-offset:2px}
 .history{display:grid;gap:8px}
 .hlist{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
 .hitem{flex:0 0 auto;width:56px;cursor:pointer;border:0;padding:0;background:none}
@@ -149,6 +153,7 @@ h1{font-family:var(--f-display);font-weight:800;font-size:clamp(34px,7vw,56px);l
       <section class="watch" id="watch" hidden aria-label="在台灣哪裡看">
         <span class="label">在台灣哪裡看</span>
         <div id="watch-rows"></div>
+        <div class="watch-search" id="watch-search"></div>
         <span class="watch-note" id="watch-note"></span>
       </section>
       <div class="lb" id="lb"></div>
@@ -168,15 +173,28 @@ h1{font-family:var(--f-display);font-weight:800;font-size:clamp(34px,7vw,56px);l
   let FILMS=[], filter='all', deck=[], hist=[], PROV=null, cur=null;
   const KINDS=[['flatrate','訂閱'],['free','免費'],['ads','免費'],['rent','租借'],['buy','購買']];
   function hasStream(f){ const r=PROV&&PROV.f[f.slug]; return !!(r&&(r.flatrate||r.free||r.ads)); }
+  const SEARCH=[
+    ['Hami Video', q=>'https://www.google.com/search?q='+encodeURIComponent('site:hamivideo.hinet.net '+q)],
+    ['friDay 影音', q=>'https://www.google.com/search?q='+encodeURIComponent('site:video.friday.tw '+q)],
+    ['MyVideo', q=>'https://www.google.com/search?q='+encodeURIComponent('site:myvideo.net.tw '+q)],
+    ['KKTV', q=>'https://www.google.com/search?q='+encodeURIComponent('site:kktv.me '+q)],
+    ['Google Play 電影', q=>'https://play.google.com/store/search?c=movies&hl=zh_TW&gl=TW&q='+encodeURIComponent(q)],
+  ];
+  function renderSearch(f){
+    const box=$('watch-search'); box.innerHTML='';
+    const l=document.createElement('span'); l.className='label'; l.textContent='到其他平台搜尋'; box.appendChild(l);
+    const q=f.tw||f.n;
+    SEARCH.forEach(([name,url])=>{ const a=document.createElement('a'); a.href=url(q); a.target='_blank'; a.rel='noopener'; a.textContent=name; a.setAttribute('aria-label','在 '+name+' 搜尋「'+q+'」'); box.appendChild(a); });
+  }
   function renderWatch(f){
     const sec=$('watch'), rows=$('watch-rows'); rows.innerHTML='';
+    sec.hidden=false; renderSearch(f);
     const r=PROV&&PROV.f[f.slug];
-    if(!r){ sec.hidden=true; return; }
-    sec.hidden=false;
+    if(!r){ $('watch-note').textContent=PROV?'':'觀看管道資料載入中…'; return; }
     const groups={};
     KINDS.forEach(([k,lab])=>{ (r[k]||[]).forEach(id=>{ (groups[lab]=groups[lab]||[]); if(!groups[lab].includes(id)) groups[lab].push(id); }); });
     const labs=Object.keys(groups);
-    if(!labs.length){ const p=document.createElement('p'); p.className='watch-none'; p.textContent='目前在台灣查不到正版串流或租售管道。'; rows.appendChild(p); }
+    if(!labs.length){ const p=document.createElement('p'); p.className='watch-none'; p.textContent='JustWatch 目前查不到這部片的台灣正版管道。'; rows.appendChild(p); }
     labs.forEach(lab=>{
       const row=document.createElement('div'); row.className='watch-row';
       const l=document.createElement('span'); l.className='label'; l.textContent=lab; row.appendChild(l);
@@ -190,7 +208,7 @@ h1{font-family:var(--f-display);font-weight:800;font-size:clamp(34px,7vw,56px);l
       });
       rows.appendChild(row);
     });
-    $('watch-note').textContent='查詢日期 '+(r.at||'').replace(/-/g,'.')+'，實際上架情形以各平台為準';
+    $('watch-note').textContent='查詢日期 '+(r.at||'').replace(/-/g,'.')+'。JustWatch 未收錄 Hami Video、friDay 影音、MyVideo、KKTV、Google Play 電影，可用上方連結自行搜尋；實際上架情形以各平台為準。';
   }
   const COLS=5, PER=25;
   try{ filter=localStorage.getItem('lb-filter')||'all' }catch(e){}
