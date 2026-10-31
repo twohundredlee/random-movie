@@ -73,16 +73,16 @@ def film_info(tid, name, year):
     f = {'n': name, 'y': year, 'o': '', 'dir': [], 'g': [], 'c': [], 'cast': [], 'rt': '', 'tl': '', 'syn': '', 'avg': None}
     if not tid:
         return f
-    zh = tmdb(f'/movie/{tid}', language='zh-TW', append_to_response='credits')
-    en = tmdb(f'/movie/{tid}', language='en-US')
+    zh = tmdb(f'/movie/{tid}', language='zh-TW')
+    en = tmdb(f'/movie/{tid}', language='en-US', append_to_response='credits')
     if not zh or not en:
         return f
     f['o'] = zh.get('original_title') or ''
     if f['o'] == name:
         f['o'] = ''
-    crew = zh.get('credits', {}).get('crew', [])
+    crew = en.get('credits', {}).get('crew', [])
     f['dir'] = [c['name'] for c in crew if c.get('job') == 'Director']
-    f['cast'] = [c['name'] for c in zh.get('credits', {}).get('cast', [])[:5]]
+    f['cast'] = [c['name'] for c in en.get('credits', {}).get('cast', [])[:5]]
     f['g'] = [g['name'] for g in en.get('genres', [])]
     f['c'] = [COUNTRY.get(c['name'], c['name']) for c in en.get('production_countries', [])]
     f['rt'] = str(en.get('runtime') or '') if en.get('runtime') else ''
