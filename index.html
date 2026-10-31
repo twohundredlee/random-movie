@@ -178,6 +178,7 @@ h1{font-family:var(--f-display);font-weight:800;font-size:clamp(34px,7vw,56px);l
     ['friDay 影音', q=>'https://www.google.com/search?q='+encodeURIComponent('site:video.friday.tw '+q)],
     ['MyVideo', q=>'https://www.google.com/search?q='+encodeURIComponent('site:myvideo.net.tw '+q)],
     ['KKTV', q=>'https://www.google.com/search?q='+encodeURIComponent('site:kktv.me '+q)],
+    ['巴哈姆特動畫瘋', q=>'https://www.google.com/search?q='+encodeURIComponent('site:ani.gamer.com.tw '+q)],
     ['Google Play 電影', q=>'https://play.google.com/store/search?c=movies&hl=zh_TW&gl=TW&q='+encodeURIComponent(q)],
   ];
   function renderSearch(f){
@@ -208,7 +209,7 @@ h1{font-family:var(--f-display);font-weight:800;font-size:clamp(34px,7vw,56px);l
       });
       rows.appendChild(row);
     });
-    $('watch-note').textContent='查詢日期 '+(r.at||'').replace(/-/g,'.')+'。JustWatch 未收錄 Hami Video、friDay 影音、MyVideo、KKTV、Google Play 電影，可用上方連結自行搜尋；實際上架情形以各平台為準。';
+    $('watch-note').textContent='查詢日期 '+(r.at||'').replace(/-/g,'.')+'。JustWatch 未收錄 Hami Video、friDay 影音、MyVideo、KKTV、巴哈姆特動畫瘋、Google Play 電影，可用上方連結自行搜尋；實際上架情形以各平台為準。';
   }
   const COLS=5, PER=25;
   try{ filter=localStorage.getItem('lb-filter')||'all' }catch(e){}
